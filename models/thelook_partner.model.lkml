@@ -12,11 +12,38 @@ datagroup: ecommerce_etl {
 }
 
 persist_with: ecommerce_etl
+
+
+############ Security #############
+access_grant: can_view_financial_data {
+  user_attribute: department
+  allowed_values: [ "finance", "executive" ]
+}
+
+
 ############ Base Explores #############
 
 explore: order_items {
   label: "(1) Orders, Items and Users"
   view_name: order_items
+
+  # required_access_grants: [can_view_financial_data]
+
+  # access_filter: {
+  #   field: distribution_centers.name
+  #   user_attribute: region
+  # }
+
+  # sql_always_where: ${distribution_centers.name} = "Chicago IL" ;;
+
+  # always_filter: {
+  #   filters: [distribution_centers.name: "Mobile AL"]
+  # }
+
+  # conditionally_filter: {
+  #   filters: [distribution_centers.name: "Houston TX"]
+  #   unless: [distribution_centers.location]
+  # }
 
   join: order_facts {
     type: left_outer
@@ -89,9 +116,7 @@ explore: order_items {
 
 
 
-
-
-#########  Event Data Explores #########
+# #########  Event Data Explores #########
 
 explore: events {
   label: "(2) Web Event Data"

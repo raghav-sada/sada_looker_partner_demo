@@ -3,6 +3,11 @@ view: inventory_items {
   view_label: "Inventory Items"
   ## DIMENSIONS ##
 
+  filter: filter_two_fields {
+    type:  string
+    sql:  {% condition %} ${created_date} {% endcondition %} and {% condition %} ${sold_date} {% endcondition %};;
+  }
+
   dimension: id {
     label: "ID"
     primary_key: yes

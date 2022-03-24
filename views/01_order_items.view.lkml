@@ -4,6 +4,8 @@ view: order_items {
   ########## IDs, Foreign Keys, Counts ###########
 
   dimension: id {
+    required_access_grants: [can_view_financial_data]
+
     label: "ID"
     primary_key: yes
     type: number
@@ -216,7 +218,11 @@ view: order_items {
 
   dimension: status {
     label: "Status"
-    sql: ${TABLE}.status ;;
+    sql: {% if _user_attributes['can_access_pii_data']  == 'yes' %}
+      ${TABLE}.status
+    {% else %}
+      MD5(${TABLE}.status)
+    {% endif %}   ;;
   }
 
   dimension: days_to_process {
