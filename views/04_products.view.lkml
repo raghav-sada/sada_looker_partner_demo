@@ -41,6 +41,7 @@ view: products {
       icon_url: "http://www.looker.com/favicon.ico"
     }
 
+
     action: {
       label: "Email Brand Promotion to Cohort"
       url: "https://desolate-refuge-53336.herokuapp.com/posts"
@@ -220,4 +221,5 @@ view: products {
   set: detail2 {
     fields: [category_count, brand_count, department_count, count, customers.count, orders.count, order_items.count, inventory_items.count, products.count]
   }
+
 }

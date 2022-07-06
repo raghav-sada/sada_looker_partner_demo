@@ -4,7 +4,7 @@ view: inventory_items {
   ## DIMENSIONS ##
 
   filter: filter_two_fields {
-    type:  string
+    type:  date
     sql:  {% condition %} ${created_date} {% endcondition %} and {% condition %} ${sold_date} {% endcondition %};;
   }
 
@@ -28,6 +28,11 @@ view: inventory_items {
     timeframes: [time, date, week, month, raw]
     #sql: cast(CASE WHEN ${TABLE}.created_at = "\\N" THEN NULL ELSE ${TABLE}.created_at END as timestamp) ;;
     sql: CAST(${TABLE}.created_at AS TIMESTAMP) ;;
+  }
+
+  dimension: max_created_date {
+    type: date
+    sql: (SELECT MAX(${created_date}) FROM looker-private-demo.ecomm.inventory_items) ;;
   }
 
   dimension: product_id {

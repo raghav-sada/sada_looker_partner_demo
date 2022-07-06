@@ -144,7 +144,7 @@ view: order_items {
       form_param: {
         name: "Price"
         type: string
-        default: "{{ order_items.sale_price._rendered_value }}"
+        # default: "{{ order_items.sale_price._rendered_value }}"
       }
 
       form_param: {
@@ -155,6 +155,7 @@ view: order_items {
     }
     value_format: "00000"
   }
+
 
   ########## Time Dimensions ##########
 
@@ -213,6 +214,29 @@ view: order_items {
     type: number
     sql: CAST(FLOOR(TIMESTAMP_DIFF(${created_raw}, ${users.created_raw}, DAY)/30) AS INT64) ;;
   }
+
+  ########## Liquid Example ##########
+  parameter: date_granularity {
+    type: unquoted
+    allowed_value: { value: "Day" }
+    allowed_value: { value: "Week" }
+    allowed_value: { value: "Month" }
+  }
+
+  dimension: dynamic_returned_date {
+    label_from_parameter: date_granularity
+    sql:
+    {% if date_granularity._parameter_value == 'Day' %}
+      ${created_date}
+    {% elsif date_granularity._parameter_value == 'Week' %}
+      ${created_week}
+    {% elsif date_granularity._parameter_value == 'Month' %}
+      ${created_month}
+    {% else %}
+      ${created_date}
+    {% endif %};;
+  }
+
 
 ########## Logistics ##########
 
@@ -295,6 +319,7 @@ view: order_items {
     value_format_name: usd
     sql: ${sale_price} ;;
     drill_fields: [detail*]
+    # html: {{rendered_value}} ;;
   }
 
   measure: total_gross_margin {
@@ -428,58 +453,58 @@ view: order_items {
 
 ########## Dynamic Sales Cohort App ##########
 
-#   filter: cohort_by {
-#     type: string
-#     hidden: yes
-#     suggestions: ["Week", "Month", "Quarter", "Year"]
-#   }
-#
-#   filter: metric {
-#     type: string
-#     hidden: yes
-#     suggestions: ["Order Count", "Gross Margin", "Total Sales", "Unique Users"]
-#   }
-#
-#   dimension_group: first_order_period {
-#     type: time
-#     timeframes: [date]
-#     hidden: yes
-#     sql: CAST(DATE_TRUNC({% parameter cohort_by %}, ${user_order_facts.first_order_date}) AS TIMESTAMP)
-#       ;;
-#   }
-#
-#   dimension: periods_as_customer {
-#     type: number
-#     hidden: yes
-#     sql: TIMESTAMP_DIFF(${user_order_facts.first_order_date}, ${user_order_facts.latest_order_date}, {% parameter cohort_by %})
-#       ;;
-#   }
-#
-#   measure: cohort_values_0 {
-#     type: count_distinct
-#     hidden: yes
-#     sql: CASE WHEN {% parameter metric %} = 'Order Count' THEN ${id}
-#         WHEN {% parameter metric %} = 'Unique Users' THEN ${users.id}
-#         ELSE null
-#       END
-#        ;;
-#   }
-#
-#   measure: cohort_values_1 {
-#     type: sum
-#     hidden: yes
-#     sql: CASE WHEN {% parameter metric %} = 'Gross Margin' THEN ${gross_margin}
-#         WHEN {% parameter metric %} = 'Total Sales' THEN ${sale_price}
-#         ELSE 0
-#       END
-#        ;;
-#   }
-#
-#   measure: values {
-#     type: number
-#     hidden: yes
-#     sql: ${cohort_values_0} + ${cohort_values_1} ;;
-#   }
+  # filter: cohort_by {
+  #   type: string
+  #   # hidden: yes
+  #   suggestions: ["Week", "Month", "Quarter", "Year"]
+  # }
+
+  # filter: metric {
+  #   type: string
+  #   # hidden: yes
+  #   suggestions: ["Order Count", "Gross Margin", "Total Sales", "Unique Users"]
+  # }
+
+  # dimension_group: first_order_period {
+  #   type: time
+  #   timeframes: [date]
+  #   # hidden: yes
+  #   sql: CAST(DATE_TRUNC({% parameter cohort_by %}, ${user_order_facts.first_order_date}) AS TIMESTAMP)
+  #     ;;
+  # }
+
+  # dimension: periods_as_customer {
+  #   type: number
+  #   # hidden: yes
+  #   sql: TIMESTAMP_DIFF(${user_order_facts.first_order_date}, ${user_order_facts.latest_order_date}, {% parameter cohort_by %})
+  #     ;;
+  # }
+
+  # measure: cohort_values_0 {
+  #   type: count_distinct
+  #   # hidden: yes
+  #   sql: CASE WHEN {% parameter metric %} = 'Order Count' THEN ${id}
+  #       WHEN {% parameter metric %} = 'Unique Users' THEN ${users.id}
+  #       ELSE null
+  #     END
+  #       ;;
+  # }
+
+  # measure: cohort_values_1 {
+  #   type: sum
+  #   # hidden: yes
+  #   sql: CASE WHEN {% parameter metric %} = 'Gross Margin' THEN ${gross_margin}
+  #       WHEN {% parameter metric %} = 'Total Sales' THEN ${sale_price}
+  #       ELSE 0
+  #     END
+  #       ;;
+  # }
+
+  # measure: values {
+  #   type: number
+  #   hidden: yes
+  #   sql: ${cohort_values_0} + ${cohort_values_1} ;;
+  # }
 
 ########## Sets ##########
 

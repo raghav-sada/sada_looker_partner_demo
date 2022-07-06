@@ -27,7 +27,7 @@ explore: order_items {
   label: "(1) Orders, Items and Users"
   view_name: order_items
 
-  # required_access_grants: [can_view_financial_data]
+  required_access_grants: [can_view_financial_data]
 
   # access_filter: {
   #   field: distribution_centers.name
@@ -46,6 +46,7 @@ explore: order_items {
   # }
 
   join: order_facts {
+  # required_access_grants: [can_view_financial_data]
     type: left_outer
     view_label: "Orders"
     relationship: many_to_one
@@ -57,8 +58,13 @@ explore: order_items {
     #Left Join only brings in items that have been sold as order_item
     type: full_outer
     relationship: one_to_one
-    sql_on: ${inventory_items.id} = ${order_items.inventory_item_id} ;;
+    sql_on: ${inventory_items.id} = ${order_items.inventory_item_id}
+      -- AND ${inventory_items.created_date} = ${inventory_items.max_created_date}
+      -- AND ${inventory_items.created_date} = MAX${inventory_items.created_date}
+      ;;
+    # sql_where: ${inventory_items.created_date} = MAX(${inventory_items.created_date}) ;;
   }
+
   join: users {
     view_label: "Users"
     type: left_outer
@@ -101,16 +107,16 @@ explore: order_items {
     relationship: many_to_one
   }
   #roll up table for commonly used queries
-  # aggregate_table: simple_rollup {
-  #   query: {
-  #     dimensions: [created_date, products.brand, products.category, products.department]
-  #     measures: [count, returned_count, returned_total_sale_price, total_gross_margin, total_sale_price]
-  #     filters: [order_items.created_date: "6 months"]
-  #   }
-  #   materialization: {
-  #     datagroup_trigger: ecommerce_etl
-  #   }
-  # }
+  aggregate_table: simple_rollup {
+    query: {
+      dimensions: [created_month, products.brand, products.category, products.department]
+      measures: [count, returned_count, returned_total_sale_price, total_gross_margin, total_sale_price]
+      # filters: [order_items.created_date: "90 days"]
+    }
+    materialization: {
+      datagroup_trigger: ecommerce_etl
+    }
+  }
 }
 
 
