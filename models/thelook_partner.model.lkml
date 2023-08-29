@@ -12,9 +12,21 @@ datagroup: ecommerce_etl {
 }
 
 persist_with: ecommerce_etl
+
+access_grant: can_access_pii_data {
+  allowed_values: ["yes"]
+  user_attribute: can_access_pii_data
+}
+
 ############ Base Explores #############
 
 explore: order_items {
+  # REMOVE AFTER DEMO
+  access_filter: {
+    field: users.state
+    user_attribute: state
+  }
+
   label: "(1) Orders, Items and Users"
   view_name: order_items
 

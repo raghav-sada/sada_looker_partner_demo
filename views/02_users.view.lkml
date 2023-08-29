@@ -22,6 +22,8 @@ view: users {
     label: "Last Name"
     hidden: yes
     sql: CONCAT(UPPER(SUBSTR(${TABLE}.last_name,1,1)), LOWER(SUBSTR(${TABLE}.last_name,2))) ;;
+
+    required_access_grants: [can_access_pii_data]
   }
 
   dimension: name {
@@ -102,6 +104,7 @@ view: users {
       }
     }
     required_fields: [name, first_name]
+    required_access_grants: [can_access_pii_data]
   }
 
   dimension: image_file {
@@ -209,6 +212,8 @@ view: users {
     type: string
     sql: CONCAT(CAST(FLOOR(10*RAND()) AS INT64),CAST(FLOOR(10*RAND()) AS INT64),
                 CAST(FLOOR(10*RAND()) AS INT64),CAST(FLOOR(10*RAND()) AS INT64));;
+
+    required_access_grants: [can_access_pii_data]
   }
 
   dimension: ssn_last_4 {
