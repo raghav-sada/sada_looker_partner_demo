@@ -17,7 +17,7 @@ persist_with: ecommerce_etl
 ############ Security #############
 access_grant: can_view_financial_data {
   user_attribute: department
-  allowed_values: [ "finance", "executive" ]
+  allowed_values: [ "financial",  "executive" ]
 }
 
 
@@ -27,17 +27,17 @@ explore: order_items {
   label: "(1) Orders, Items and Users"
   view_name: order_items
 
-  required_access_grants: [can_view_financial_data]
+  # required_access_grants: [can_view_financial_data]
 
   # access_filter: {
   #   field: distribution_centers.name
   #   user_attribute: region
   # }
 
-  # sql_always_where: ${distribution_centers.name} = "Chicago IL" ;;
+  # sql_always_where: ${distribution_centers.name} = "Denver CO" ;;
 
   # always_filter: {
-  #   filters: [distribution_centers.name: "Mobile AL"]
+  #   filters: [order_items.created_date: "1 year"]
   # }
 
   # conditionally_filter: {
@@ -46,7 +46,7 @@ explore: order_items {
   # }
 
   join: order_facts {
-  # required_access_grants: [can_view_financial_data]
+    required_access_grants: [can_view_financial_data]
     type: left_outer
     view_label: "Orders"
     relationship: many_to_one
@@ -54,6 +54,7 @@ explore: order_items {
   }
 
   join: inventory_items {
+    required_access_grants: [can_view_financial_data]
     view_label: "Inventory Items"
     #Left Join only brings in items that have been sold as order_item
     type: full_outer

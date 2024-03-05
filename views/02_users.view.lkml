@@ -202,25 +202,28 @@ view: users {
     sql: ${TABLE}.traffic_source ;;
   }
 
-  dimension: ssn {
-    label: "SSN"
-    # dummy field used in next dim, generate 4 random numbers to be the last 4 digits
+  dimension: ssn_raw {
     hidden: yes
     type: string
-    sql: CONCAT(CAST(FLOOR(10*RAND()) AS INT64),CAST(FLOOR(10*RAND()) AS INT64),
-                CAST(FLOOR(10*RAND()) AS INT64),CAST(FLOOR(10*RAND()) AS INT64));;
+    sql:
+    CONCAT(CAST(FLOOR(10*RAND()) AS INT64),CAST(FLOOR(10*RAND()) AS INT64),CAST(FLOOR(10*RAND()) AS INT64),"-",
+                CAST(FLOOR(10*RAND()) AS INT64),CAST(FLOOR(10*RAND()) AS INT64),"-",
+                CAST(FLOOR(10*RAND()) AS INT64),CAST(FLOOR(10*RAND()) AS INT64),CAST(FLOOR(10*RAND()) AS INT64),
+                CAST(FLOOR(10*RAND()) AS INT64)) ;;
   }
 
-  dimension: ssn_last_4 {
-    label: "SSN Last 4"
-    description: "Only users with sufficient permissions will see this data"
+  dimension: ssn {
+    label: "SSN"
     type: string
-    sql: ${ssn} ;;
-# FIX - Need to add user attribute
-#    sql: CASE WHEN '{{_user_attributes["can_see_sensitive_data"]}}' = 'Yes'
-#                THEN ${ssn}
-#                ELSE '####' END;;
+    sql:
+      {% if _user_attributes["can_access_pii_data"] == "yes" %}
+        ${ssn_raw}
+      {% else %}
+        CONCAT('XXX-XX-', RIGHT(${ssn_raw},4))
+      {% endif %}
+    ;;
   }
+
 
   ## MEASURES ##
 
